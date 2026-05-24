@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from objectpack.actions import ObjectPack
 from objectpack.ui import ModelEditWindow, BaseEditWindow
 from m3_ext.ui import all_components as ext
+from datetime import date
 
 class PermissionEditWindow(BaseEditWindow):
     def _init_components(self):
@@ -16,7 +17,7 @@ class PermissionEditWindow(BaseEditWindow):
         
         self.field__content_type = ext.ExtDictSelectField(
             label=u'content_type',
-            name='content_type',
+            name='content_type_id',
             pack=ContentTypePack,
             allow_blank=False,
             anchor='100%',
@@ -42,123 +43,116 @@ class PermissionEditWindow(BaseEditWindow):
         self.height = 'auto'
 
 
+class UserEditWindow(BaseEditWindow):
+    def _init_components(self):
+        super(UserEditWindow, self)._init_components()
+
+        self.field__password = ext.ExtStringField(
+            label=u'password',
+            name='password',
+            input_type='password',
+            allow_blank=False,
+            anchor='100%')
+        
+        self.field__last_login = ext.ExtDateField(
+            label=u'last login',
+            name='last_login',
+            anchor='100%',
+            format='d.m.Y')
+        
+        self.field__is_superuser = ext.ExtCheckBox(
+            label=u'superuser status',
+            name='is_superuser',
+            checked=False,
+            anchor='100%')
+        
+        self.field__username = ext.ExtStringField(
+            label=u'username',
+            name='username',
+            allow_blank=False,
+            anchor='100%')
+        
+        self.field__first_name = ext.ExtStringField(
+            label=u'first name',
+            name='first_name',
+            allow_blank=False,
+            anchor='100%')
+        
+        self.field__last_name = ext.ExtStringField(
+            label=u'last name',
+            name='last_name',
+            allow_blank=False,
+            anchor='100%')
+        
+        self.field__email = ext.ExtStringField(
+            label=u'email address',
+            name='email',
+            allow_blank=False,
+            anchor='100%')
+        
+        self.field__is_staff = ext.ExtCheckBox(
+            label=u'staff status',
+            name='is_staff',
+            checked=False,
+            anchor='100%')
+
+        self.field__is_active = ext.ExtCheckBox(
+            label=u'active',
+            name='is_active',
+            checked=True,
+            anchor='100%')
+        
+        self.field__date_joined = ext.ExtDateField(
+            label=u'date joined',
+            name='date_joined',
+            anchor='100%',
+            format='d.m.Y',
+            value=date.today())
+    
+    def _do_layout(self):
+        super(UserEditWindow, self)._do_layout()
+        self.form.items.extend((
+            self.field__password,
+            self.field__last_login,
+            self.field__is_superuser,
+            self.field__username,
+            self.field__first_name,
+            self.field__last_name,
+            self.field__email,
+            self.field__is_staff,
+            self.field__is_active,
+            self.field__date_joined,
+        ))
+
+    def set_params(self, params):
+        super(UserEditWindow, self).set_params(params)
+        self.height = 'auto'
+
 class UserPack(ObjectPack):
     model = User
-    #'logentry', 'id', 'password', 'last_login', 'is_superuser', 'username', 
-    #'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'date_joined', 
-    #'groups', 'user_permissions'
-
+    
+    add_window = edit_window = UserEditWindow
     add_to_menu = True
 
 
 class GroupPack(ObjectPack):
     model = Group
-    #'user', 'id', 'name', 'permissions'
-    
+        
     add_window = edit_window = ModelEditWindow.fabricate(model)
-
     add_to_menu = True
 
-    columns = [
-         {
-            'data_index': 'user',
-            'header': u'user',
-            'width': 1,
-        },
-        {
-            'data_index': 'id',
-            'header': u'id',
-            'width': 1,
-        },
-        {
-            'data_index': 'name',
-            'header': u'name',
-            'width': 1,
-        },
-        {
-            'data_index': 'permissions',
-            'header': u'permissions',
-            'width': 1,
-        },
-
-    ]
-
+    
 class PermissionPack(ObjectPack):
     model = Permission
-    #'group', 'user', 'id', 'name', 'content_type', 'codename'
-
+    
     add_window = edit_window = PermissionEditWindow
-
     add_to_menu = True
-
-    # columns = [
-    #      {
-    #         'data_index': 'group',
-    #         'header': u'group',
-    #         'width': 1,
-    #     },
-    #     {
-    #         'data_index': 'user',
-    #         'header': u'user',
-    #         'width': 1,
-    #     },
-    #     {
-    #         'data_index': 'id',
-    #         'header': u'id',
-    #         'width': 1,
-    #     },
-    #     {
-    #         'data_index': 'name',
-    #         'header': u'name',
-    #         'width': 1,
-    #     },
-    #     {
-    #         'data_index': 'content_type',
-    #         'header': u'content_type',
-    #         'width': 1,
-    #     },
-    #      {
-    #         'data_index': 'codename',
-    #         'header': u'codename',
-    #         'width': 1,
-    #     },
-
-    # ]
 
 
 class ContentTypePack(ObjectPack):
     model = ContentType
-    #'logentry', 'permission', 'id', 'app_label', 'model'
-    
-    #add_window = edit_window = ModelEditWindow.fabricate(model)
-
+        
+    add_window = edit_window = ModelEditWindow.fabricate(model)
     add_to_menu = True
 
-    columns = [
-         {
-            'data_index': 'logentry',
-            'header': u'logentry',
-            'width': 1,
-        },
-        {
-            'data_index': 'permission',
-            'header': u'permission',
-            'width': 1,
-        },
-        {
-            'data_index': 'id',
-            'header': u'id',
-            'width': 1,
-        },
-        {
-            'data_index': 'app_label',
-            'header': u'app_label',
-            'width': 1,
-        },
-        {
-            'data_index': 'model',
-            'header': u'model',
-            'width': 1,
-        },
-         
-    ]
+   
